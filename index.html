@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Demo for Image Processing</title>
+	<link rel="stylesheet" type="text/css" media="all" href="css/styles.css" />
+	<script src="js/base64.js"></script>
+	<script src="js/canvas2image.js"></script>
+</head>
+<body>
+
+	<h1>Demo for Image Processing</h1>
+
+	<p>This is a demo for some simple image processing algorithm as the homework of the Image Processing Course.</p>
+
+	<p>For more information, please refer to:</p>
+	<ul>
+		<li><a href="./algorithm.html">Introduction of Using Algorithm</a></li>
+		<li><a href="./script.html">Part of Main Algorihtm Scripts</a></li>
+		<li><a href="./summary.html">Summary of This Demo</a></li>
+		<li><a href="./reference.html">References for This Demo</a></li>
+	</ul>
+
+	<form id="upload" action="upload.php" method="POST" enctype="multipart/form-data">
+
+		<fieldset>
+			<legend>HTML File Upload</legend>
+
+			<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+
+			<div>
+				<label for="fileselect">Files to upload:</label>
+				<input type="file" id="fileselect" name="fileselect[]" multiple="multiple" />
+				<div id="filedrag">or drop files here</div>
+			</div>
+
+			<div id="submitbutton">
+				<button type="submit">Upload Files</button>
+			</div>
+
+		</fieldset>
+
+	</form>
+
+	<div id="messages">
+		<p>Status Messages</p>
+	</div>
+
+	<div id="display">
+		<p>
+			Image Show
+			<input type="button" id="undo" name="undo" value="Undo" disabled="disabled" />
+		</p>
+		<canvas id="imagedisplay">
+			Your browser does not support the canvas element.
+		</canvas>
+	</div>
+
+	<form id="saveGroup" class="area">
+		<fieldset>
+			<legend>Save &amp; Convert</legend>
+
+			<div id="textdownload" style="display:none;font-style:italic;">Now you can right click and download the image<br/>
+			<input type="button" id="resetbtn" value="Reset">
+			</div>
+
+			<div id="buttoncontainer" style="display:block;">
+			<input type="button" id="savepngbtn" value="Save PNG">
+			<input type="button" id="convertpngbtn" value="Convert to PNG">
+			<br/>
+			<input type="button" id="savebmpbtn" value="Save BMP">
+			<input type="button" id="convertbmpbtn" value="Convert to BMP">
+			<br/>
+			<input type="button" id="savejpegbtn" value="Save JPEG">
+			<input type="button" id="convertjpegbtn" value="Convert to JPEG">
+			</div>
+
+		</fieldset>
+
+	</form>
+
+	<form id="buttonGroup" class="area">
+		<fieldset>
+			<legend>Transform</legend>
+
+			<input type="button" id="RGBA2Gray" name="RGBA2Gray" value="灰度化" />
+			<br />
+			<input type="button" id="balancebtn" name="balancebtn" value="直方图均衡化" />
+			<br />
+			<input type="button" id="FlipH" name="FlipH" value="水平翻转" />
+			<input type="button" id="FlipV" name="FlipV" value="垂直翻转" />
+
+		</fieldset>
+		
+	</form>
+
+	<form id="zoomGroup" class="area">
+		<fieldset>
+			<legend>Zoom</legend>
+
+			<table><tr><td>
+			<label for="zoomWidth">Width : </label>
+			<input type="number" id="zoomWidth" name="zoomWidth" max="1600" min="1" step="0.1" value="100" />
+			<label>%</label>
+			<br />
+			<label for="zoomHeight">Height: </label>
+			<input type="number" id="zoomHeight" name="zoomHeight" max="1600" min="1" step="0.1" value="100" />
+			<label>%</label>
+			<br />
+			<input type="button" id="defaultbtn" name="defaultbtn" value="重置" />
+			</td><td>
+			<input type="button" id="zoombtn" name="zoombtn" value="近邻取样缩放" /><br />
+			<input type="button" id="bilinearbtn" name="bilinearbtn" value="二次线性插值" /><br />
+			<input type="button" id="triconvbtn" name="triconvbtn" value="三次卷积插值" />
+			</td></tr></table>
+
+		</fieldset>
+		
+	</form>
+
+	<form id="enhanceGroup" class="area">
+		<fieldset>
+			<legend>Enhancement</legend>
+
+			<input type="button" id="sobelbtn" name="sobelbtn" value="Sobel锐化" />
+			<select id="sobelsel">
+				<option>横向3阶</option>
+				<option>横向5阶</option>
+				<option>纵向3阶</option>
+				<option>纵向5阶</option>
+			</select>
+			<br />
+			<input type="button" id="laplacianbtn" name="laplacianbtn" value="Laplacian锐化" />
+			<select id="laplaciansel">
+				<option>负中心-4邻域</option>
+				<option>负中心-对角邻域</option>
+				<option>负中心-8邻域</option>
+				<option>正中心-4邻域</option>
+				<option>正中心-对角邻域</option>
+				<option>正中心-8邻域</option>
+			</select>
+			<br />
+			<input type="button" id="logbtn" name="logbtn" value="LoG锐化" />
+			<input type="button" id="kirschbtn" name="kirschbtn" value="Kirsch锐化" />
+
+		</fieldset>
+
+	</form>
+
+	<form id="blurGroup" class="area">
+		<fieldset>
+			<legend>Blur</legend>
+
+			<label for="blursize">Blur Radius: </label>
+			<b id="blursize">1</b> <i>px</i>
+			<br />
+			<input type="range" id="sizerng" name="sizerng" min="1" max="12" step="1" value="1" />
+			<br/>
+			<input type="button" id="blurbtn" name="blurbtn" value="均值滤波" />
+			<input type="button" id="gaussianbtn" name="gaussianbtn" value="高斯滤波" />
+			<br />
+			<input type="button" id="medianbtn" name="medianbtn" value="中值滤波" />
+			<input type="button" id="fmedianbtn" name="fmedianbtn" value="快速中值滤波" />
+
+		</fieldset>
+
+	</form>
+
+	<form id="filterGroup" class="area">
+		<fieldset>
+			<legend>Linear Filter</legend>
+
+			<label for="kernelsize">Kernel Size</label>
+			<select id="kernelsize">
+				<option>3</option>
+				<option>5</option>
+			</select>
+			<input type="button" id="filterbtn" name="filterbtn" value="线性滤波" />
+			<br />
+
+			<table>
+				<style type="text/css" id="sizetable">.s5{display: none;}</style>
+				<tr class="s5">
+					<td><input type="text" id="k00" /></td>
+					<td><input type="text" id="k01" /></td>
+					<td><input type="text" id="k02" /></td>
+					<td><input type="text" id="k03" /></td>
+					<td><input type="text" id="k04" /></td>
+				</tr>
+				<tr>
+					<td class="s5"><input type="text" id="k10" /></td>
+					<td class="s3"><input type="text" id="k11" /></td>
+					<td class="s3"><input type="text" id="k12" /></td>
+					<td class="s3"><input type="text" id="k13" /></td>
+					<td class="s5"><input type="text" id="k14" /></td>
+				</tr>
+				<tr>
+					<td class="s5"><input type="text" id="k20" /></td>
+					<td class="s3"><input type="text" id="k21" /></td>
+					<td class="s3"><input type="text" id="k22" /></td>
+					<td class="s3"><input type="text" id="k23" /></td>
+					<td class="s5"><input type="text" id="k24" /></td>
+				</tr>
+				<tr>
+					<td class="s5"><input type="text" id="k30" /></td>
+					<td class="s3"><input type="text" id="k31" /></td>
+					<td class="s3"><input type="text" id="k32" /></td>
+					<td class="s3"><input type="text" id="k33" /></td>
+					<td class="s5"><input type="text" id="k34" /></td>
+				</tr>
+				<tr class="s5">
+					<td><input type="text" id="k40" /></td>
+					<td><input type="text" id="k41" /></td>
+					<td><input type="text" id="k42" /></td>
+					<td><input type="text" id="k43" /></td>
+					<td><input type="text" id="k44" /></td>
+				</tr>
+			</table>
+
+		</fieldset>
+
+	</form>
+
+	<footer>
+		<h2>Disclaimer</h2>
+		<p>The code was developed by <a href="https://github.com/fno2010/">Jingxuan Zhang</a> of <a href="http://en.tjcities.com/">CITIES Innovation Studio</a> for <a href="http://www.tongji.edu.cn/">Tongji University</a>.</p>
+
+		<p>You can contact me with <u>2010_fno@tongji.edu.cn</u> or <u>jingxuan.n.zhang@gmail.com</u>.</p>
+
+		<p>This code can be <a href="http://fno2010.eicp.net/wp-content/uploads/materials/imgproc.zip">downloaded and used</a> without any restrictions but please don't expect support!</p>
+	</footer>
+
+	<!--script src="imagex.js"></script-->
+	<script src="js/main.js"></script>
+</body>
+</html>

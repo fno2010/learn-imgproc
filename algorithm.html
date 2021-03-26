@@ -1,0 +1,186 @@
+<!Doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Introduction of Using Algorithm - Demo for Image Processing</title>
+	<link rel="stylesheet" type="text/css" media="all" href="css/styles.css" />
+</head>
+<body>
+
+	<h1>Introduction of Using Algorithm</h1>
+
+	<h2>这里是对本Demo中用到的一些经典的图像处理算法的简单介绍</h2>
+
+	<div id="directory">
+		<h2><strong>目录</strong></h2>
+		<ul>
+			<li><a href="#d1">图像的灰度化</a></li>
+			<li><a href="#d2">直方图均衡化</a></li>
+			<li>
+				<a href="#d3">图像缩放</a>
+				<ul>
+					<li><a href="#d31">近邻取样法</a></li>
+					<li><a href="#d32">二次线性插值法</a></li>
+					<li><a href="#d33">三次卷积插值法</a></li>
+				</ul>
+			</li>
+			<li>
+				<a href="#d4">线性滤波</a>
+				<ul>
+					<li><a href="#d41">一般线性滤波</a></li>
+					<li><a href="#d42">Sobel算子</a></li>
+					<li><a href="#d43">Laplacian算子</a></li>
+					<li><a href="#d44">LoG算子</a></li>
+					<li><a href="#d45">Kirsch算子</a></li>
+				</ul>
+			</li>
+			<li>
+				<a href="#d5">平滑处理</a>
+				<ul>
+					<li><a href="#d51">均值平滑</a></li>
+					<li><a href="#d52">高斯平滑</a></li>
+					<li><a href="#d53">中值平滑</a></li>
+					<li><a href="#d54">中值平滑快速算法</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+
+	<a href="./index.html">返回</a>
+
+	<hr />
+
+	<h2 id="d1"><strong>图像的灰度化</strong></h2>
+	<p>彩色图像灰度化的一般方法是对RGB三个通道分别乘一个颜色系数。</p>
+	<p>本Demo引用了OpenCV中的颜色系数，转换公式如下：</p>
+	<img src="img/gray.jpg" />
+
+	<hr />
+
+	<h2 id="d2"><strong>直方图均衡化</strong></h2>
+	<p>直方图均衡化的本质是图像的灰度映射。</p>
+	<p>一般方法可归结为：</p>
+	<ol>
+		<li>统计各灰度级的频率 <strong><i>Freq(Gray)</i></strong></li>
+		<li>计算各灰度级的频率积累 <strong><i>T(Gray)</i></strong></li>
+		<li>进行灰度映射</li>
+	</ol>
+	<p>本Demo采用的灰度映射关系为 <strong><i>Gray -> floor[(L - 1)*T(Gray) + 0.5]</i></strong></p>
+	<p>其中 <strong><i>L</i></strong> 为灰度的分级数。</p>
+
+	<br />
+
+	<p>而对于彩色图像，处理方案有很多，本Demo采用的是将RGB转为HSV模型，然后对V分量做均衡化，再转换回RGB</p>
+
+	<hr />
+
+	<h2 id="d3"><strong>图像缩放</strong></h2>
+	<p>图像的缩放就是改变图像的原始尺寸，由于数字图像是离散的，所以缩放的关键就在于补充空间中原先并不存在的像素值。</p>
+	<p>图像缩放的常用方法有三种：近邻取样法、二次线性插值、三次卷积插值。</p>
+
+	<h3 id="d31">近邻取样法</h3>
+	<p>将相对坐标距离目标像素最近的点的灰度值赋给目标点。</p>
+	<img src="img/zoom.jpg" />
+
+	<br />
+
+	<h3 id="d32">二次线性插值法</h3>
+	<p>取向对坐标距离目标像素最近的四个点，对这四个点的灰度值作两次线性的插值。</p>
+	<img src="img/zoom2.gif" />
+	<br />
+
+	<h2><strong><i>
+		tmpColor0 = Color0*(1-u) + Color2*u <br />
+		tmpColor1 = Color1*(1-u) + Color3*u <br />
+		DstColor = tmpColor0*(1-v) + tmpColor2*v
+	</i></strong></h2>
+
+	<br />
+
+	<h3 id="d33">三次卷积插值法</h3>
+	<p>取向对坐标距离目标像素最近的16个点，对这16个点的灰度值作三次卷积插值。</p>
+	<img src="img/zoom3.jpg" />
+	<br />
+
+	<strong><i>其中 S(x) 是对 sin(x * PI)/(x * PI) 的近似</i></strong>
+
+	<br />
+
+	<hr />
+
+	<h2 id="d4"><strong>线性滤波</strong></h2>
+	<p>线性滤波是空域增强的常用方法，这里介绍先行滤波的一般方法以及常见的线性滤波算子。</p>
+
+	<h3 id="d41">一般线性滤波</h3>
+	<p>线性滤波就是将一个图像矩阵与线性算子做卷积。</p>
+	<p>所谓卷积，就是将落在窗口中的图像块按算子的每个分量作加权均值。</p>
+	<img src="img/linearfilter.png" />
+	<br />
+	<p>以下是几种常见的线性滤波算子。</p>
+
+	<br />
+
+	<h3 id="d42">Sobel算子</h3>
+	<img src="img/sobel.jpg" />
+
+	<br />
+
+	<h3 id="d43">Laplacian算子</h3>
+	<img src="img/laplacian.jpg" />
+
+	<br />
+
+	<h3 id="d44">LoG算子</h3>
+	<img src="img/log.jpg" />
+
+	<br />
+
+	<h3 id="d45">Kirsch算子</h3>
+	<p>与其它算子不同，Kirsch算子有八个模版，分别由下图模版循环转45度得到，结果取其中的最大响应值。</p>
+	<img src="img/kirsch.jpg" />
+
+	<br />
+
+	<hr />
+
+	<h2 id="d5"><strong>平滑处理</strong></h2>
+	<p>平滑处理，又称为模糊处理，本质同为滤波，这里主要介绍三种常用平滑算法。</p>
+
+	<h3 id="d51">均值平滑</h3>
+	<p>最简单，每次取窗口内的像素均值。</p>
+
+	<br />
+
+	<h3 id="d52">高斯平滑</h3>
+	<p>常用于处理高斯噪声，算子来自于二维高斯函数。</p>
+
+	<br />
+
+	<h3 id="d53">中值平滑</h3>
+	<p>每次取窗口内像素的中位数，由此得名，主要用于处理椒盐噪声</p>
+
+	<br />
+
+	<h3 id="d54">中值平滑快速算法</h3>
+	<p>由于标准的中值平滑算法是基于统计排序的，而排序会消耗大量计算资源，这使得中值平滑在实际应用中会处理得很慢。</p>
+	<p>为了改进时间复杂度，这里引入了一种新的算法，使用直方图统计代替排序，用直方图修正的方法来减少计算量。</p>
+	<p>实际使用结果，程序的速度确实得到了显著提升，尤其在处理大模糊半径的时候，运行速度几乎不受半径的影响。</p>
+	<p>算法的实现可参考Demo中的“快速中值滤波”，原理可以参考<a href="./reference.html">Reference</a>中的“中值滤波快速算法”。</p>
+
+	<br />
+
+	<hr />
+
+	<a href="./index.html">返回</a>
+
+	<footer>
+		<h2>Disclaimer</h2>
+		<p>The code was developed by <a href="https://github.com/fno2010/">Jingxuan Zhang</a> of <a href="http://en.tjcities.com/">CITIES Innovation Studio</a> for <a href="http://www.tongji.edu.cn/">Tongji University</a>.</p>
+
+		<p>You can contact me with <u>2010_fno@tongji.edu.cn</u> or <u>jingxuan.n.zhang@gmail.com</u>.</p>
+
+		<p>This code can be <a href="http://fno2010.eicp.net/wp-contexts/uploads/materials/improc.zip">downloaded and used</a> without any restrictions but please don't expect support!</p>
+	</footer>
+
+</body>
+</html>
